@@ -2,7 +2,8 @@ import * as React from 'react';
 import { Text, Image, StyleSheet, TextInput, SafeAreaView, Pressable } from 'react-native';
 import {validateEmail} from '../utils/index';
 
-const OnboardingScreen = ({ navigation }) => {
+const OnboardingScreen = ({navigation, onCompleteOnboarding}) => {
+
   const [name, onChangeName] = React.useState('');
   const [email, onChangeEmail] = React.useState('');
 
@@ -12,8 +13,8 @@ const OnboardingScreen = ({ navigation }) => {
 
   const continueOnboarding = ()=>{
     if(isFormValid()){
-      alert('continue onboarding');
-      navigation.navigate('Profile');
+      onCompleteOnboarding(name, email);
+      navigation.navigate('Home');
     }
   }
 
