@@ -59,14 +59,14 @@ const styles = StyleSheet.create({
   text: {
     width: 300,
     textAlign: 'center',
-    fontSize: 20,
+    fontSize: 14,
   },
   input: {
     borderColor: '#51614a',
     width:300,
     marginTop: 20,
     marginBottom: 20,
-    fontSize: 20,
+    fontSize: 14,
     textAlign: 'center',
     borderWidth : 1,
     padding: 10,
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
   buttonText: {
     textAlign: 'center',
     color: 'white',
-    fontSize: 20,
+    fontSize: 14,
   },
   buttonDisabled : {
     backgroundColor : '#B7B7B7',
