@@ -40,3 +40,16 @@ export async function saveMenuItems(menuItems) {
   });
 }
 
+export async function getFilteredMenuItems(text, categories) {
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(`select * from menuitems where title like '%${text}%' and category in (${categories.map((item) => {
+        return `'${item}'`
+      }).join(', ')})`, [], (_, { rows }) => {
+        resolve(rows._array);
+      }, (t, error) => {
+        console.log(error);
+      });
+    });
+  });
+}

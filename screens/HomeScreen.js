@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Text, Image, StyleSheet, TextInput, SafeAreaView, Pressable, View, StatusBar, FlatList} from 'react-native';
 import {
     createTable,
+    getFilteredMenuItems,
     getMenuItems,
     saveMenuItems,
 } from '../database';
@@ -25,6 +26,7 @@ const HomeScreen = ({navigation}) => {
         FILTERS.map(() => false)
     );
     const [filteredItems, setFilteredItems] = React.useState([]);
+    const [filterText, setFilterText] = React.useState('');
 
     useEffect(() => {
         (async () => {
@@ -56,7 +58,7 @@ const HomeScreen = ({navigation}) => {
     };
 
     React.useEffect(()=>{
-        console.log('active filters', activeFilters);
+        // filter by category
         if(!activeFilters.includes(true)){
             console.log('no filters selected')
             setFilteredItems(menuItems);
@@ -68,7 +70,29 @@ const HomeScreen = ({navigation}) => {
             console.log('result of filtering', newFilteredItems);
             setFilteredItems(newFilteredItems);
         }
-    },[activeFilters]);
+        // filter by text
+        if(!!filterText){
+            const newFilteredItems = filteredItems.filter(item=>item.name.toLowerCase().indexOf(filterText.toLowerCase())>=0);
+            setFilteredItems(newFilteredItems);
+        }
+    },[activeFilters,filterText]);
+
+    useEffect(() => {
+        (async () => {
+            try {
+                console.log('filter text', filterText);
+                const categories = [];
+                for(let i =0;i<FILTERS.length;i++){
+                    if(activeFilters[i]) categories.push(FILTERS[i]);
+                }
+                let menuItems = await getFilteredMenuItems(filterText, categories);
+                console.log('filtered menu items', menuItems);
+            } catch (e) {
+                // Handle error
+                Alert.alert(e.message);
+            }
+        })();
+    }, [filterText]);
 
     const Item = ({item}) => (
         <View style={styles.item}>
@@ -91,6 +115,13 @@ const HomeScreen = ({navigation}) => {
                     <View style={{flex:1}}>
                         <Text style={styles.heroSubtitle}>Chicago</Text>
                         <Text style={styles.heroText}>We are a family owned Mediterranean restaurant, focused on traditional recipes served with a modern twist.</Text>
+                        <TextInput
+                            style={styles.input}
+                            onChangeText={(text) => setFilterText(text)}
+                            value={filterText}
+                            placeholder="Search..."
+                            keyboardType="text"
+                        />
                     </View>
                     <Image source={require('../assets/hero.jpg')} style={styles.heroImage} />
                 </View>
@@ -161,7 +192,14 @@ const styles = StyleSheet.create({
     firstTitle: {
         paddingLeft:15,
         paddingTop:10,
-    }
+    },
+    input: {
+        borderBottomColor:'#F4CE14',
+        borderBottomWidth : 1,
+        padding: 10,
+        paddingLeft:0,
+        color: 'white',
+    },
 });
 
 export default HomeScreen;
