@@ -5,8 +5,10 @@ import {
     getMenuItems,
     saveMenuItems,
 } from '../database';
+import Filters from '../components/Filters';
 
 const API_URL = 'https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/capstone.json';
+const FILTERS = ['starters','main','desserts','drinks','specials'];
 
 const fetchData = async() => {
     return fetch(API_URL)
@@ -19,6 +21,10 @@ const fetchData = async() => {
 const HomeScreen = ({navigation}) => {
 
     const [menuItems, setMenuItems] = React.useState([]);
+    const [activeFilters, setActiveFilters] = useState(
+        FILTERS.map(() => false)
+    );
+    const [filteredItems, setFilteredItems] = React.useState([]);
 
     useEffect(() => {
         (async () => {
@@ -34,7 +40,8 @@ const HomeScreen = ({navigation}) => {
                 console.log('fetched menu items', menuItems);
                 saveMenuItems(menuItems);
             }
-            setMenuItems(menuItems)
+            setMenuItems(menuItems);
+            setFilteredItems(menuItems);
             } catch (e) {
             // Handle error
             Alert.alert(e.message);
@@ -42,14 +49,26 @@ const HomeScreen = ({navigation}) => {
         })();
     }, []);
 
-    // useEffect(()=>{
-    //     fetch('https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/capstone.json')
-    //         .then(res=>res.json())
-    //         .then(res=>{
-    //             console.log('fetched menu',res);
-    //             setMenuItems(res.menu);
-    //         });
-    // },[]);
+    const handleFiltersChange = async (index) => {
+        const arrayCopy = [...activeFilters];
+        arrayCopy[index] = !activeFilters[index];
+        setActiveFilters(arrayCopy);
+    };
+
+    React.useEffect(()=>{
+        console.log('active filters', activeFilters);
+        if(!activeFilters.includes(true)){
+            console.log('no filters selected')
+            setFilteredItems(menuItems);
+        }
+        else {
+            const newFilteredItems = menuItems.filter(item=>{
+                return activeFilters[FILTERS.indexOf(item.category.toLowerCase())]
+            });
+            console.log('result of filtering', newFilteredItems);
+            setFilteredItems(newFilteredItems);
+        }
+    },[activeFilters]);
 
     const Item = ({item}) => (
         <View style={styles.item}>
@@ -65,9 +84,11 @@ const HomeScreen = ({navigation}) => {
     );
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView>
+            <Text style={{...styles.title,...styles.firstTitle}}>ORDER FOR DELIVERY!</Text>
+            <Filters filters={FILTERS} onChange={handleFiltersChange} activeFilters={activeFilters}/>
             <FlatList
-                data={menuItems}
+                data={filteredItems}
                 renderItem={({item}) => <Item item={item} />}
                 keyExtractor={item => item.name}
             />
@@ -105,6 +126,10 @@ const styles = StyleSheet.create({
         width:80,
         height:80,
         resizeMode: 'cover'
+    },
+    firstTitle: {
+        paddingLeft:15,
+        paddingTop:10,
     }
 });
 
