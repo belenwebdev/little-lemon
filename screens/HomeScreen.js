@@ -1,18 +1,55 @@
 import React, { useState, useEffect } from 'react';
 import { Text, Image, StyleSheet, TextInput, SafeAreaView, Pressable, View, StatusBar, FlatList} from 'react-native';
+import {
+    createTable,
+    getMenuItems,
+    saveMenuItems,
+} from '../database';
+
+const API_URL = 'https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/capstone.json';
+
+const fetchData = async() => {
+    return fetch(API_URL)
+        .then(response => response.json())
+        .then(apiData => {
+            return apiData.menu;
+        });
+}
 
 const HomeScreen = ({navigation}) => {
 
     const [menuItems, setMenuItems] = React.useState([]);
 
-    useEffect(()=>{
-        fetch('https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/capstone.json')
-            .then(res=>res.json())
-            .then(res=>{
-                console.log('fetched menu',res);
-                setMenuItems(res.menu);
-            });
-    },[]);
+    useEffect(() => {
+        (async () => {
+            try {
+            await createTable();
+            console.log('table was created');
+            let menuItems = await getMenuItems();
+            // The application only fetches the menu data once from a remote URL
+            // and then stores it into a SQLite database.
+            // After that, every application restart loads the menu from the database
+            if (!menuItems || !menuItems.length) {
+                menuItems = await fetchData();
+                console.log('fetched menu items', menuItems);
+                saveMenuItems(menuItems);
+            }
+            setMenuItems(menuItems)
+            } catch (e) {
+            // Handle error
+            Alert.alert(e.message);
+            }
+        })();
+    }, []);
+
+    // useEffect(()=>{
+    //     fetch('https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/capstone.json')
+    //         .then(res=>res.json())
+    //         .then(res=>{
+    //             console.log('fetched menu',res);
+    //             setMenuItems(res.menu);
+    //         });
+    // },[]);
 
     const Item = ({item}) => (
         <View style={styles.item}>
