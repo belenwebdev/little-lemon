@@ -85,6 +85,16 @@ const HomeScreen = ({navigation}) => {
 
     return (
         <SafeAreaView>
+            <View style={styles.heroSection}>
+                <Text style={styles.heroTitle}>Little Lemon</Text>
+                <View style={styles.inline}>
+                    <View style={{flex:1}}>
+                        <Text style={styles.heroSubtitle}>Chicago</Text>
+                        <Text style={styles.heroText}>We are a family owned Mediterranean restaurant, focused on traditional recipes served with a modern twist.</Text>
+                    </View>
+                    <Image source={require('../assets/hero.jpg')} style={styles.heroImage} />
+                </View>
+            </View>
             <Text style={{...styles.title,...styles.firstTitle}}>ORDER FOR DELIVERY!</Text>
             <Filters filters={FILTERS} onChange={handleFiltersChange} activeFilters={activeFilters}/>
             <FlatList
@@ -100,6 +110,27 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         marginTop: StatusBar.currentHeight || 0,
+    },
+    heroSection:{
+        backgroundColor: '#51614a',
+        padding:10
+    },
+    heroTitle:{
+        fontSize:30,
+        color:'#F4CE14'
+    },
+    heroSubtitle:{
+        fontSize:24,
+        color:'white'
+    },
+    heroText:{
+        color:'white',
+    },
+    heroImage:{
+        height:120,
+        width:120,
+        resizeMode:'cover',
+        borderRadius:10,
     },
     item: {
         backgroundColor: 'white',
