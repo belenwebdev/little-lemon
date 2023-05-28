@@ -87,7 +87,7 @@ const RootNavigator = () => {
     }
     return (
         <Stack.Navigator initialRouteName={ state.isOnboardingCompleted ? 'Home' : 'Onboarding'}>
-            <Stack.Screen name="Onboarding" options={{ headerTitle: headerTitle}}>
+            <Stack.Screen name="Onboarding" options={{ headerTitle: headerTitle, headerBackVisible: false, headerLeft: () => <></> }}>
                 {props => <OnboardingScreen {...props} onCompleteOnboarding={completeOnboarding} />}
             </Stack.Screen>
             <Stack.Screen name="Profile" options={headerOptions}>
