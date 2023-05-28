@@ -1,19 +1,39 @@
 import React, { useState, useEffect } from 'react';
-import { Text, Image, StyleSheet, TextInput, SafeAreaView, Pressable, View, CheckBox } from 'react-native';
+import { Text, Image, StyleSheet, TextInput, Platform, Pressable, View, CheckBox } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 
+const MOCK_IMAGE = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png';
 const ProfileScreen = ({navigation, onSignOut, onSaveChanges, initialState}) => {
 
     console.log('initialState', initialState);
 
     const [userData, setUserData] = React.useState({...initialState});
-
-    function changeAvatar(){
-        alert('change avatar');
-    }
+    // const [image, setImage] = useState(MOCK_IMAGE);
 
     function removeAvatar(){
-        setUserData(prevData=>{ return{...prevData, avatar: null}});
+        setUserData(prevData=>{ return{...prevData, avatar: MOCK_IMAGE}});
+        // setImage(MOCK_IMAGE);
     }
+
+    const pickImage = async () => {
+        // No permissions request is necessary for launching the image library
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+        });
+
+        console.log(result);
+
+        if (!result.canceled) {
+            console.log('result', result);
+            const newImageUri = !!result.assets ? result.assets[0].uri : result.uri;
+            console.log(newImageUri);
+            setUserData(prevData=>{ return{...prevData, avatar: newImageUri}});
+            // setImage(result.assets[0].uri);
+        }
+    };
 
     function handleChange(event, name) {
         const {value, type, checked} = event.target;
@@ -34,10 +54,6 @@ const ProfileScreen = ({navigation, onSignOut, onSaveChanges, initialState}) => 
         }))
     }
 
-    function discardChanges(){
-        setUserData(initialState);
-    }
-
     useEffect(()=>{
         console.log('user data changed', userData);
     },[userData]);
@@ -50,12 +66,12 @@ const ProfileScreen = ({navigation, onSignOut, onSaveChanges, initialState}) => 
                 <Image
                     style={styles.avatar}
                     source={{
-                        uri: 'https://reactnative.dev/img/tiny_logo.png',
+                        uri: userData.avatar,
                     }}/>
-                <Pressable onPress={changeAvatar} style={styles.buttonPrimary}>
+                <Pressable onPress={pickImage} style={styles.buttonPrimary}>
                     <Text style={styles.buttonPrimaryText}>Change</Text>
                 </Pressable>
-                <Pressable onPress={removeAvatar} style={!!userData.avatar ? styles.buttonSecondary : styles.buttonDisabled}>
+                <Pressable onPress={removeAvatar} style={userData.avatar == MOCK_IMAGE ? styles.buttonSecondary : styles.buttonDisabled}>
                     <Text style={styles.buttonSecondaryText}>Remove</Text>
                 </Pressable>
             </View>
@@ -128,7 +144,7 @@ const ProfileScreen = ({navigation, onSignOut, onSaveChanges, initialState}) => 
                 <Text style={styles.buttonSecondaryText}>Sign out</Text>
             </Pressable>
             <View style={styles.inline}>
-                <Pressable onPress={discardChanges} style={{...styles.buttonSecondary, flex:1}}>
+                <Pressable onPress={()=>{setUserData(initialState)}} style={{...styles.buttonSecondary, flex:1}}>
                     <Text style={styles.buttonSecondaryText}>Discard changes</Text>
                 </Pressable>
                 <Pressable onPress={()=>{onSaveChanges(userData)}} style={{...styles.buttonPrimary, flex:1}}>
@@ -154,6 +170,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems:'center',
         gap: 10,
+        height:50,
     },
     text:{
         marginBottom:10,

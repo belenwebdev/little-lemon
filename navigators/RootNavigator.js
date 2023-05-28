@@ -77,7 +77,7 @@ const RootNavigator = () => {
         headerRight: () => (
             <Pressable
                 onPress={() => navigation.navigate('Profile')}
-            ><Image source={{uri: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'}} style={{width:40, height:40, borderRadius:20, marginRight: 10}}/></Pressable>
+            ><Image source={{uri: state.userData.avatar}} style={{width:40, height:40, borderRadius:20, marginRight: 10}}/></Pressable>
         ),
     });
 
